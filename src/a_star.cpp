@@ -1,10 +1,46 @@
 #include "a_star.h"
-bool operator==(const Node& lhs, const Node& rhs){}
+
+bool operator==(const Node& lhs, const Node& rhs){
+    return rhs.x == lhs.x && rhs.y == rhs.y;
+}
+
+bool Compare_f_cost::operator()(const Node& node1, const Node& node2){
+    return node1.f < node2.f;
+}
+
+bool Compare_g_cost::operator()(const Node& node1, const Node& node2){
+    return node1.g < node2.g;
+}
 
 A_star::A_star(){}
 
 void A_star::backtracker(){}
 int A_star::min_cost(const Node& node){}
+bool A_star::valid_node(const Node& node) {
+    if(cost_map.empty()){
+        // TODO we have a problem
+    }
+    int cost_map_height = cost_map.size();
+    if(cost_map[0].empty()){
+        // TODO we have a problem
+    }
+    int cost_map_width = cost_map[0].size();
+    // check if position is 'in-bounds'
+    if(node.x < 0 || node.y < 0 || node.x >= cost_map_width || node.y >= cost_map_height){
+        return false;
+    }
+    // check if we have already visited node
+    auto it = closed_set.find(node);
+    if(!it){
+        it = find(open_set.begin(), open_set.end(), node);
+    }
+    // if we have already found node with lower cost don't add node
+    if(it && it->g <= node.g){
+            return false;
+    }
+    // else we want to explore node
+    return true;
+}
 void A_star::gpsCallback(const nav_msgs::Odometry::ConstPtr& msg){}
 void A_star::costMapCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg){}
 

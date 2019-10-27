@@ -22,11 +22,11 @@ class Node{
 bool operator==(const Node& lhs, const Node& rhs);
 
 class Compare_f_cost{
-
+    bool operator()(const Node& node1, const Node& node2);
 };
 
 class Compare_g_cost{
-
+    bool operator()(const Node& node1, const Node& node2);
 };
 
 class A_star{
