@@ -4,6 +4,13 @@ bool operator==(const Node& lhs, const Node& rhs){
     return rhs.x == lhs.x && rhs.y == rhs.y;
 }
 
+size_t node_hash::operator()(const Node& node) const{
+    size_t hashx = std::hash<int>() (node.x);
+    size_t hashy = std::hash<int>() (node.y);
+    // XOR to avoid hash collision
+    return hashx ^ hashy;
+}
+
 bool Compare_f_cost::operator()(const Node& node1, const Node& node2){
     return node1.f < node2.f;
 }
@@ -14,8 +21,16 @@ bool Compare_g_cost::operator()(const Node& node1, const Node& node2){
 
 A_star::A_star(){}
 
-void A_star::backtracker(){}
-int A_star::min_cost(const Node& node){}
+void A_star::backtracker(std::vector<Node>& path){
+    Node cur = closed_set.find(target);
+    while(cur.parent){
+        path.insert(cur);
+        cur = cur.parent;
+    }
+    path.insert(start);
+    std::reverse(path.begin(), path.end());
+}
+
 bool A_star::valid_node(const Node& node) {
     if(cost_map.empty()){
         // TODO we have a problem
@@ -52,32 +67,38 @@ void A_star::Search(){
         // Using 4 connected for now
         Node north = Node(cur.x, cur.y+1, &cur);
         if(north == target){
-
+            closed_set.insert(north);
+            break;
         }
         if(valid_node(north)){
             open_set.push(north);
         }
         Node east = Node(cur.x+1, cur.y, &cur);
         if(east == target){
-
+            closed_set.insert(east);
+            break;
         }
         if(valid_node(east)){
             open_set.push(east);
         }
         Node south = Node(cur.x, cur.y-1, &cur);
         if(south == target){
-
+            closed_set.insert(south);
+            break;
         }
         if(valid_node(south)){
             open_set.push(south);
         }
         Node west = Node(cur.x-1, cur.y, &cur);
         if(west == target){
-
+            closed_set.insert(south);
+            break;
         }
         if(valid_node(west)){
             open_set.push(west);
         }
         closed_set.insert(cur);
     }
+    std::vector<Node> path;
+    backtracker(path);
 }
