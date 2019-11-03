@@ -12,18 +12,21 @@ class Node{
     public:
     Node(int x, int y, Node* parent);
     private:
-    geometry_msgs::Point position;
-    Node* parent;
+    const int x;
+    const int y;
+    const Node* parent;
     int f;
     int g;
-    int h;
+    const int h;
 };
 
-bool operator==(const Node& lhs, const Node& rhs);
-
-class node_hash{
+class Node_hash{
     size_t operator()(const Node& node) const;
 };
+
+class Compare_cord{
+    bool operator()(const Node& lhs, const Node& rhs);
+}
 
 class Compare_f_cost{
     bool operator()(const Node& node1, const Node& node2);
@@ -37,8 +40,8 @@ class A_star{
     public:
     A_star();
     void Search();
-    void backtracker(std::vector<Node>& path);
-    bool valid_node(const Node& node);
+    void Backtracker(std::vector<Node>& path);
+    bool ValidNode(const Node& node);
     void gpsCallback(const nav_msgs::Odometry::ConstPtr& msg);
     void costMapCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg);
 
@@ -46,8 +49,8 @@ class A_star{
     friend class Node;
 
     private:
-    Node start;
-    Node target;
+    const Node start;
+    const Node target;
     geometry_msgs::Pose current_pose;
     std::priority_queue<Node, Compare_f_cost> open_set;
     std::unordered_set<Node, node_hash> closed_set;
