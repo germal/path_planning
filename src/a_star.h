@@ -11,7 +11,7 @@
 
 class Node{
     public:
-        Node(int x, int y, Node* parent);
+        Node(const int x, const int y, const Node* parent, const int h);
         int f() const;
     private:
         const int x;
@@ -51,21 +51,12 @@ class A_star{
         friend class Node;
 
     private:
-<<<<<<< HEAD
     const Node start;
     const Node target;
     geometry_msgs::Pose current_pose;
     std::priority_queue<Node, Compare_f_cost> open_set;
     std::unordered_set<Node, node_hash, Compare_cord> closed_set;
     std::vector<std::vector<int>> cost_map;
-=======
-        const Node start;
-        const Node target;
-        geometry_msgs::Pose current_pose;
-        std::priority_queue<Node, Compare_f_cost> open_set;
-        std::unordered_set<Node, node_hash> closed_set;
-        std::vector<std::vector<int>> cost_map;
->>>>>>> 8ab555604b9bef0c6430f95a005725ca49b7e06e
 };
 
 #endif

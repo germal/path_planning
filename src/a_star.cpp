@@ -1,5 +1,13 @@
 #include "a_star.h"
 
+Node::Node(const int x, const int y, const Node* parent, const int h){
+    x = x;
+    y = y;
+    parent = parent;
+    g = parent->g + cost_map[x][y];
+    h = calculateEuclideanDistance(*this, target);
+}
+
 int Node::f() const {
     return g+h;
 }
