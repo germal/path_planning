@@ -11,11 +11,11 @@
 class Node{
     public:
     Node(int x, int y, Node* parent);
+    int f() const;
     private:
     const int x;
     const int y;
     const Node* parent;
-    int f;
     int g;
     const int h;
 };

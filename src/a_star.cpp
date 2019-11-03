@@ -1,5 +1,9 @@
 #include "a_star.h"
 
+int Node::f() const {
+    return g+h;
+}
+
 size_t Node_hash::operator()(const Node& node) const{
     const size_t hashx = std::hash<int>() (node.x);
     const size_t hashy = std::hash<int>() (node.y);
@@ -12,7 +16,7 @@ bool Compare_cord::operator()(const Node& lhs, const Node& rhs){
 }
 
 bool Compare_f_cost::operator()(const Node& node1, const Node& node2){
-    return node1.f < node2.f;
+    return node1.f() < node2.f();
 }
 
 bool Compare_g_cost::operator()(const Node& node1, const Node& node2){
