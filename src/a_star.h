@@ -53,9 +53,8 @@ class A_star{
     const Node target;
     geometry_msgs::Pose current_pose;
     std::priority_queue<Node, Compare_f_cost> open_set;
-    std::unordered_set<Node, node_hash> closed_set;
+    std::unordered_set<Node, node_hash, Compare_cord> closed_set;
     std::vector<std::vector<int>> cost_map;
-
 };
 
 #endif
