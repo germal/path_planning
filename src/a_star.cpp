@@ -1,27 +1,33 @@
 #include "a_star.h"
 
-bool operator==(const Node& lhs, const Node& rhs){
-    return rhs.x == lhs.x && rhs.y == rhs.y;
+int Node::f() const {
+    return g+h;
 }
 
-size_t node_hash::operator()(const Node& node) const{
-    size_t hashx = std::hash<int>() (node.x);
-    size_t hashy = std::hash<int>() (node.y);
+size_t Node_hash::operator()(const Node& node) const{
+    const size_t hashx = std::hash<int>() (node.x);
+    const size_t hashy = std::hash<int>() (node.y);
     // XOR to avoid hash collision
     return hashx ^ hashy;
 }
 
+bool Compare_cord::operator()(const Node& lhs, const Node& rhs){
+    return rhs.x == lhs.x && rhs.y == rhs.y;
+}
+
 bool Compare_f_cost::operator()(const Node& node1, const Node& node2){
-    return node1.f < node2.f;
+    return node1.f() < node2.f();
 }
 
 bool Compare_g_cost::operator()(const Node& node1, const Node& node2){
     return node1.g < node2.g;
 }
 
-A_star::A_star(){}
+A_star::A_star(){
+    //TODO
+}
 
-void A_star::backtracker(std::vector<Node>& path){
+void A_star::Backtracker(std::vector<Node>& path){
     Node cur = closed_set.find(target);
     while(cur.parent){
         path.insert(cur);
@@ -31,15 +37,15 @@ void A_star::backtracker(std::vector<Node>& path){
     std::reverse(path.begin(), path.end());
 }
 
-bool A_star::valid_node(const Node& node) {
+bool A_star:ValidNode(const Node& node) {
     if(cost_map.empty()){
         // TODO we have a problem
     }
-    int cost_map_height = cost_map.size();
+    const int cost_map_height = cost_map.size();
     if(cost_map[0].empty()){
         // TODO we have a problem
     }
-    int cost_map_width = cost_map[0].size();
+    cobst int cost_map_width = cost_map[0].size();
     // check if position is 'in-bounds'
     if(node.x < 0 || node.y < 0 || node.x >= cost_map_width || node.y >= cost_map_height){
         return false;
@@ -65,6 +71,7 @@ void A_star::Search(){
         Node cur = open_set.top();
         open_set.pop();
         // Using 4 connected for now
+        //TODO make 8 connected
         Node north = Node(cur.x, cur.y+1, &cur);
         if(north == target){
             closed_set.insert(north);
