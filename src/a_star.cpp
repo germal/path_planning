@@ -57,7 +57,7 @@ bool A_star:ValidNode(const Node& node) {
     }
     // if we have already found node with lower cost don't add node
     if(it && it->g <= node.g){
-            return false;
+        return false;
     }
     // else we want to explore node
     return true;
@@ -108,4 +108,9 @@ void A_star::Search(){
     }
     std::vector<Node> path;
     backtracker(path);
+}
+
+double A_star::calculateEuclideanDistance(const Node& node1, const Node& node2)
+{
+    return pow(pow(node1.x - node2.x, 2) - pow(node1.y - node2.y, 2),0.5);
 }
