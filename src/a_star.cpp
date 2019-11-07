@@ -1,6 +1,6 @@
 #include "a_star.h"
 
-Node::Node(const int x, const int y, const Node* parent, const int h){
+A_Star::Node::Node(const int x, const int y, const Node* parent, const int h){
     x = x;
     y = y;
     parent = parent;
@@ -8,26 +8,26 @@ Node::Node(const int x, const int y, const Node* parent, const int h){
     h = calculateEuclideanDistance(*this, target);
 }
 
-int Node::f() const {
+int A_Star::Node::f() const {
     return g+h;
 }
 
-size_t Node_hash::operator()(const Node& node) const{
+size_t A_Star::Node_hash::operator()(const Node& node) const{
     const size_t hashx = std::hash<int>() (node.x);
     const size_t hashy = std::hash<int>() (node.y);
     // XOR to avoid hash collision
     return hashx ^ hashy;
 }
 
-bool Compare_cord::operator()(const Node& lhs, const Node& rhs){
+bool A_Star::Compare_cord::operator()(const Node& lhs, const Node& rhs){
     return rhs.x == lhs.x && rhs.y == rhs.y;
 }
 
-bool Compare_f_cost::operator()(const Node& node1, const Node& node2){
+bool A_Star::Compare_f_cost::operator()(const Node& node1, const Node& node2){
     return node1.f() < node2.f();
 }
 
-bool Compare_g_cost::operator()(const Node& node1, const Node& node2){
+bool A_Star::Compare_g_cost::operator()(const Node& node1, const Node& node2){
     return node1.g < node2.g;
 }
 
@@ -45,7 +45,7 @@ void A_star::Backtracker(std::vector<Node>& path){
     std::reverse(path.begin(), path.end());
 }
 
-bool A_star:ValidNode(const Node& node) {
+bool A_star::ValidNode(const Node& node) {
     if(cost_map.empty()){
         // TODO we have a problem
     }
@@ -73,6 +73,18 @@ bool A_star:ValidNode(const Node& node) {
 void A_star::gpsCallback(const nav_msgs::Odometry::ConstPtr& msg){}
 void A_star::costMapCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg){}
 
+bool A_star::processNode(const int x, const int y, const Node* parent){
+    Node node = Node(x, y, parent);
+    if(Compare_cord(node, target)){
+        closed_set.insert(node);
+        return true;
+    }
+    if(valid_node(node)){
+        open_set.push(node);
+    }
+    return false;
+}
+
 void A_star::Search(){
     open_set.insert(start);
     while(!open_set.empty()){
@@ -80,37 +92,11 @@ void A_star::Search(){
         open_set.pop();
         // Using 4 connected for now
         //TODO make 8 connected
-        Node north = Node(cur.x, cur.y+1, &cur);
-        if(north == target){
-            closed_set.insert(north);
+        if(processNode(cur.x, cur.y+1, &cur) // north
+        || processNode(cur.x+1, cur.y, &cur) // east
+        || processNode(cur.x, cur.y-1, &cur) // south
+        || processNode(cur.x-1, cur.y, &cur) ){ // west
             break;
-        }
-        if(valid_node(north)){
-            open_set.push(north);
-        }
-        Node east = Node(cur.x+1, cur.y, &cur);
-        if(east == target){
-            closed_set.insert(east);
-            break;
-        }
-        if(valid_node(east)){
-            open_set.push(east);
-        }
-        Node south = Node(cur.x, cur.y-1, &cur);
-        if(south == target){
-            closed_set.insert(south);
-            break;
-        }
-        if(valid_node(south)){
-            open_set.push(south);
-        }
-        Node west = Node(cur.x-1, cur.y, &cur);
-        if(west == target){
-            closed_set.insert(south);
-            break;
-        }
-        if(valid_node(west)){
-            open_set.push(west);
         }
         closed_set.insert(cur);
     }
