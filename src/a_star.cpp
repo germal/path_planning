@@ -108,3 +108,33 @@ double A_star::calculateEuclideanDistance(const Node& node1, const Node& node2)
 {
     return pow(pow(node1.x - node2.x, 2) - pow(node1.y - node2.y, 2),0.5);
 }
+
+void A_star::gpsCallback(const nav_msgs::Odometry::ConstPtr& msg)
+{
+    // Fill out the needed "target" position member variable using info from the odom message
+    target = Node(msg->pose.pose.position.x, msg->pose.pose.position.y, nullptr);
+	
+	// Fill out the member variable that stores the current pose
+	currentPose = msg->pose.pose;
+    start = Node(currentPose.position.x, currentPose.position.y, nullptr);
+
+}
+
+oid A_star::costmapCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg)
+{
+	// Fill out the costmap width and height from the occupancy grid info message
+    int costmap_width = msg->info.width;
+    int costmap_height = msg->info.height;
+
+    // Fill out the needed "start" position member variable using info from the costmap origin message
+    start = Node(msg->info.origin.orientation.x, msg->info.origin.orientation.y, nullptr); // why is this here and in gps?
+
+    // Fill out the costmap member variable using info from the occupancy grid costmap message
+    for(int i = 0; i < costmap_width; i++)
+    {
+        for(int j = 0; j < costmap_height; j++)
+        {
+            cost_map[i][j] = msg->data[i + (j * costmap_width)];
+        }
+    }
+}
