@@ -1,8 +1,8 @@
 #include "a_star.h"
 
-A_Star::Node::Node(const int x, const int y, const Node* parent, const int h){
-    x = x;
-    y = y;
+A_Star::Node::Node(const int x_in, const int y_in, const Node* parent){
+    x = x_in;
+    y = y_in;
     parent = parent;
     g = parent->g + cost_map[x][y];
     h = calculateEuclideanDistance(*this, target);
@@ -100,13 +100,11 @@ bool A_star::Search(){
     return true;
 }
 
-double A_star::calculateEuclideanDistance(const Node& node1, const Node& node2)
-{
+double A_star::calculateEuclideanDistance(const Node& node1, const Node& node2){
     return pow(pow(node1.x - node2.x, 2) - pow(node1.y - node2.y, 2),0.5);
 }
 
-void A_star::gpsCallback(const nav_msgs::Odometry::ConstPtr& msg)
-{
+void A_star::gpsCallback(const nav_msgs::Odometry::ConstPtr& msg){
     // Fill out the needed "target" position member variable using info from the odom message
     target = Node(msg->pose.pose.position.x, msg->pose.pose.position.y, nullptr);
 	
@@ -114,8 +112,7 @@ void A_star::gpsCallback(const nav_msgs::Odometry::ConstPtr& msg)
 	currentPose = msg->pose.pose;
 }
 
-void A_star::costmapCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg)
-{
+void A_star::costmapCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg){
 	// Fill out the costmap width and height from the occupancy grid info message
     int costmap_width = msg->info.width;
     int costmap_height = msg->info.height;
@@ -124,10 +121,8 @@ void A_star::costmapCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg)
     start = Node(msg->info.origin.orientation.x, msg->info.origin.orientation.y, nullptr); // why is this here and in gps?
 
     // Fill out the costmap member variable using info from the occupancy grid costmap message
-    for(int i = 0; i < costmap_width; i++)
-    {
-        for(int j = 0; j < costmap_height; j++)
-        {
+    for(int i = 0; i < costmap_width; i++){
+        for(int j = 0; j < costmap_height; j++){
             cost_map[i][j] = msg->data[i + (j * costmap_width)];
         }
     }
