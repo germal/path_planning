@@ -5,7 +5,7 @@ const std::string kCostmap_topic = "move_base/local_costmap/costmap";
 
 using namespace std;
 
-class calculate_path{
+class calculate_path {
 private:
 	ros::Subscriber &gps;
 	ros::Subscriber &costmap;
@@ -14,15 +14,14 @@ private:
 public:
 	vector<geometry_msgs::position> solution_path;
 	calculate_path(ros::Subscriber &gps_in, ros::Subscriber &costmap_in, A_star &a_star)
-		: gps(gps_in), costmap(costmap_in), listener(a_star), at_target(false) { }
+		: gps(gps_in), costmap(costmap_in), listener(a_star), at_target(false) {}
 	void operator()(const ros::TimerEvent&);
 	bool get_at_target() const{
 		return at_target;
 	}
 };
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
 	ros::init(argc, argv, "listener");
 
 	ros::NodeHandle n;
@@ -60,20 +59,6 @@ int main(int argc, char **argv)
 }
 
 void calculate_path::operator()(const ros::TimerEvent&) {
-	// Placeholders for the coordinates of the starting position
-	unsigned int start_x = listener.start.x;
-	unsigned int start_y = listener.start.y;
-
-	// Placeholders for gps coordinates for the target
-	unsigned int gps_target_x = listener.target.x;
-	unsigned int gps_target_y = listener.target.y;
-
-	// Create a position object that holds the starting position
-	position start(start_x, start_y);
-
-	// Create a position object that holds the position of the target
-	position target(gps_target_x, gps_target_y);
-
 	// Attempt to find a solution
 	at_target = listener.Search();
 }
