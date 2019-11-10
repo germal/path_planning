@@ -19,7 +19,7 @@ size_t A_Star::Node_hash::operator()(const Node& node) const{
     return hashx ^ hashy;
 }
 
-bool A_Star::Compare_cord::operator()(const Node& lhs, const Node& rhs){
+bool A_Star::Compare_coord::operator()(const Node& lhs, const Node& rhs){
     return rhs.x == lhs.x && rhs.y == rhs.y;
 }
 
@@ -71,7 +71,7 @@ bool A_star::ValidNode(const Node& node) {
 
 bool A_star::processNode(const int x, const int y, const Node* parent){
     Node node = Node(x, y, parent);
-    if(Compare_cord(node, target)){
+    if(Compare_coord(node, target)){
         closed_set.insert(node);
         return true;
     }
@@ -96,7 +96,7 @@ bool A_star::Search(){
         }
         closed_set.insert(cur);
     }
-    backtracker();
+    Backtracker();
     return true;
 }
 

@@ -22,7 +22,7 @@ public:
 };
 
 int main(int argc, char **argv) {
-	ros::init(argc, argv, "listener");
+	ros::init(argc, argv, "/path_planning/listener");
 
 	ros::NodeHandle n;
 

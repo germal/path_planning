@@ -38,7 +38,7 @@ class A_star{
             size_t operator()(const Node& node) const;
         };
 
-        class Compare_cord{
+        class Compare_coord{
             bool operator()(const Node& lhs, const Node& rhs);
         }
 
