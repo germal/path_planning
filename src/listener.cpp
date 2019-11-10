@@ -10,11 +10,15 @@ private:
 	ros::Subscriber &gps;
 	ros::Subscriber &costmap;
 	A_star &listener;
+	bool at_target;
 public:
-	vector<position> solution_path;
+	vector<geometry_msgs::position> solution_path;
 	calculate_path(ros::Subscriber &gps_in, ros::Subscriber &costmap_in, A_star &a_star)
-		: gps(gps_in), costmap(costmap_in), listener(a_star) { }
+		: gps(gps_in), costmap(costmap_in), listener(a_star), at_target(false) { }
 	void operator()(const ros::TimerEvent&);
+	bool get_at_target() const{
+		return at_target;
+	}
 };
 
 int main(int argc, char **argv)
@@ -23,15 +27,13 @@ int main(int argc, char **argv)
 
 	ros::NodeHandle n;
 
-	bool at_target = false;
-
 	A_star listener = A_star{};
 
-	ros::Subscriber gps_sub = n.subscribe(kGPS_topic, 1000, &GoatControl::gpsCallback, &listener);
-	ros::Subscriber costmap_sub = n.subscribe(kCostmap_topic, 1000, &GoatControl::costmapCallback, &listener);
+	ros::Subscriber gps_sub = n.subscribe(kGPS_topic, 1000, listener.gpsCallback);
+	ros::Subscriber costmap_sub = n.subscribe(kCostmap_topic, 1000, listener.costMapCallback);
 
 	// Calculated path vector can be accessed via path.solution_path
-	calculate_path path(gps_sub, costmap_sub);
+	calculate_path path(gps_sub, costmap_sub, listener);
 	
 	// Update coordinates once before calculating path
 	ros::spinOnce();
@@ -44,8 +46,7 @@ int main(int argc, char **argv)
 
 	// Keep spinning until you reach the target
     ros::Rate rate(10); // 10 hz
-	while(!at_target)
-	{
+	while(!path.get_at_target()) {
 		ros::spinOnce();
         rate.sleep();
     }
@@ -53,11 +54,8 @@ int main(int argc, char **argv)
 	// Stop running timer that calculates path
 	timer.stop();
 
-	// TO DO: publish path once it is calculated
-
-	// TO DO: look into how to determine whether target is reached (at_target
-	// currently stays false)
-
+	ros::Publisher path_pub = n.advertise<vector<geometry_msgs::position>("path", 1000);
+	path_pub.publish(path.solution_path);
 	return 0;
 }
 
@@ -77,6 +75,5 @@ void calculate_path::operator()(const ros::TimerEvent&) {
 	position target(gps_target_x, gps_target_y);
 
 	// Attempt to find a solution
-	bool foundtarget = listener.Search();
-
+	at_target = listener.Search();
 }

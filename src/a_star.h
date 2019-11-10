@@ -53,6 +53,7 @@ class A_star{
     private:
         const Node start;
         const Node target;
+        std::vector<Node> path;
         geometry_msgs::Pose current_pose;
         std::priority_queue<Node, Compare_f_cost> open_set;
         std::unordered_set<Node, node_hash, Compare_cord> closed_set;

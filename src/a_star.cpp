@@ -31,11 +31,9 @@ bool A_Star::Compare_g_cost::operator()(const Node& node1, const Node& node2){
     return node1.g < node2.g;
 }
 
-A_star::A_star(){
-    //TODO
-}
+A_star::A_star(){}
 
-void A_star::Backtracker(std::vector<Node>& path){
+void A_star::Backtracker(){
     Node cur = closed_set.find(target);
     while(cur.parent){
         path.insert(cur);
@@ -70,8 +68,6 @@ bool A_star::ValidNode(const Node& node) {
     // else we want to explore node
     return true;
 }
-void A_star::gpsCallback(const nav_msgs::Odometry::ConstPtr& msg){}
-void A_star::costMapCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg){}
 
 bool A_star::processNode(const int x, const int y, const Node* parent){
     Node node = Node(x, y, parent);
@@ -85,7 +81,7 @@ bool A_star::processNode(const int x, const int y, const Node* parent){
     return false;
 }
 
-void A_star::Search(){
+bool A_star::Search(){
     open_set.insert(start);
     while(!open_set.empty()){
         Node cur = open_set.top();
@@ -100,8 +96,8 @@ void A_star::Search(){
         }
         closed_set.insert(cur);
     }
-    std::vector<Node> path;
-    backtracker(path);
+    backtracker();
+    return true;
 }
 
 double A_star::calculateEuclideanDistance(const Node& node1, const Node& node2)
@@ -116,11 +112,9 @@ void A_star::gpsCallback(const nav_msgs::Odometry::ConstPtr& msg)
 	
 	// Fill out the member variable that stores the current pose
 	currentPose = msg->pose.pose;
-    start = Node(currentPose.position.x, currentPose.position.y, nullptr);
-
 }
 
-oid A_star::costmapCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg)
+void A_star::costmapCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg)
 {
 	// Fill out the costmap width and height from the occupancy grid info message
     int costmap_width = msg->info.width;
