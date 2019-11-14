@@ -1,4 +1,10 @@
 #include "a_star.h"
+#include <ros/ros.h">
+#include <std_msgs/String.h>
+#include <nav_msgs/OccupancyGrid.h>
+#include <nav_msgs/Odometry.h>
+#include <sensor_msgs/Imu.h>
+
 
 const std::string kGPS_topic = "/odometry/filtered";
 const std::string kCostmap_topic = "move_base/local_costmap/costmap";
@@ -60,5 +66,5 @@ int main(int argc, char **argv) {
 
 void calculate_path::operator()(const ros::TimerEvent&) {
 	// Attempt to find a solution
-	at_target = listener.Search();
+	at_target = listener.search();
 }

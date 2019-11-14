@@ -1,9 +1,10 @@
 #include "a_star.h"
+#include <algorithm>
 
-A_Star::Node::Node(const int x_in, const int y_in, const Node* parent){
+A_Star::Node::Node(const int x_in, const int y_in, const Node* parent_in){
     x = x_in;
     y = y_in;
-    parent = parent;
+    parent = parent_in;
     g = parent->g + cost_map[x][y];
     h = calculateEuclideanDistance(*this, target);
 }
@@ -33,7 +34,7 @@ bool A_Star::Compare_g_cost::operator()(const Node& node1, const Node& node2){
 
 A_star::A_star(){}
 
-void A_star::Backtracker(){
+void A_star::backtracker(){
     Node cur = closed_set.find(target);
     while(cur.parent){
         path.insert(cur);
@@ -43,15 +44,9 @@ void A_star::Backtracker(){
     std::reverse(path.begin(), path.end());
 }
 
-bool A_star::ValidNode(const Node& node) {
-    if(cost_map.empty()){
-        // TODO we have a problem
-    }
+bool A_star::validNode(const Node& node) {
     const int cost_map_height = cost_map.size();
-    if(cost_map[0].empty()){
-        // TODO we have a problem
-    }
-    cobst int cost_map_width = cost_map[0].size();
+    const int cost_map_width = cost_map[0].size();
     // check if position is 'in-bounds'
     if(node.x < 0 || node.y < 0 || node.x >= cost_map_width || node.y >= cost_map_height){
         return false;
@@ -81,7 +76,7 @@ bool A_star::processNode(const int x, const int y, const Node* parent){
     return false;
 }
 
-bool A_star::Search(){
+bool A_star::search(){
     open_set.insert(start);
     while(!open_set.empty()){
         Node cur = open_set.top();
@@ -91,25 +86,26 @@ bool A_star::Search(){
         if(processNode(cur.x, cur.y+1, &cur) // north
         || processNode(cur.x+1, cur.y, &cur) // east
         || processNode(cur.x, cur.y-1, &cur) // south
-        || processNode(cur.x-1, cur.y, &cur) ){ // west
+        || processNode(cur.x-1, cur.y, &cur) // west
+        || processNode(cur.x + 1, cur.y + 1, &cur) // north-east
+        || processNode(cur.x + 1, cur.y - 1, &cur) // south-east
+        || processNode(cur.x - 1, cur.y + 1, &cur) // north-west
+        || processNode(cur.x - 1, cur.y - 1, &cur)) { // south-west
             break;
         }
         closed_set.insert(cur);
     }
-    Backtracker();
+    backtracker();
     return true;
 }
 
 double A_star::calculateEuclideanDistance(const Node& node1, const Node& node2){
-    return pow(pow(node1.x - node2.x, 2) - pow(node1.y - node2.y, 2),0.5);
+    return pow(node1.x - node2.x, 2) - pow(node1.y - node2.y, 2); // can compare dist^2
 }
 
 void A_star::gpsCallback(const nav_msgs::Odometry::ConstPtr& msg){
     // Fill out the needed "target" position member variable using info from the odom message
     target = Node(msg->pose.pose.position.x, msg->pose.pose.position.y, nullptr);
-	
-	// Fill out the member variable that stores the current pose
-	currentPose = msg->pose.pose;
 }
 
 void A_star::costmapCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg){
@@ -118,7 +114,7 @@ void A_star::costmapCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg){
     int costmap_height = msg->info.height;
 
     // Fill out the needed "start" position member variable using info from the costmap origin message
-    start = Node(msg->info.origin.orientation.x, msg->info.origin.orientation.y, nullptr); // why is this here and in gps?
+    start = Node(msg->info.origin.orientation.x, msg->info.origin.orientation.y, nullptr);
 
     // Fill out the costmap member variable using info from the occupancy grid costmap message
     for(int i = 0; i < costmap_width; i++){

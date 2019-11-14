@@ -1,9 +1,6 @@
 #ifndef A_STAR_H
 #define A_STAR_H
 
-#include "ros/ros.h"
-#include "nav_msgs/OccupancyGrid.h"
-#include "nav_msgs/Odometry.h"
 #include <vector>
 #include <queue>
 #include <unordered_set>
@@ -13,9 +10,9 @@
 class A_star{
     public:
         A_star();
-        void Search();
-        void Backtracker(std::vector<Node>& path);
-        bool ValidNode(const Node& node);
+        void search();
+        void backtracker(std::vector<Node>& path);
+        bool validNode(const Node& node);
         bool processNode(cost int x, const int y, const Node* parent);
         void gpsCallback(const nav_msgs::Odometry::ConstPtr& msg);
         void costMapCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg);
@@ -24,7 +21,7 @@ class A_star{
     protected:
         class Node{
             public:
-                Node(const int x, const int y, const Node* parent, const int h);
+                Node(const int x_in, const int y_in, const Node* parent_in);
                 int f() const;
             private:
                 const int x;
@@ -54,7 +51,6 @@ class A_star{
         const Node start;
         const Node target;
         std::vector<Node> path;
-        geometry_msgs::Pose current_pose;
         std::priority_queue<Node, Compare_f_cost> open_set;
         std::unordered_set<Node, node_hash, Compare_cord> closed_set;
         std::vector<std::vector<int>> cost_map;
