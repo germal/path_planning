@@ -1,38 +1,47 @@
 #include "a_star.h"
 #include <algorithm>
 
-A_Star::Node::Node(const int x_in, const int y_in, const Node* parent_in){
-    x = x_in;
-    y = y_in;
-    parent = parent_in;
-    g = parent->g + cost_map[x][y];
-    h = calculateEuclideanDistance(*this, target);
+A_Star::Node::Node(const int x_in, const int y_in, const Node* parent_in) {
+	x = x_in;
+	y = y_in;
+	parent = parent_in;
+	g = parent->g + cost_map[x][y];
+	h = calculateEuclideanDistance(*this, target);
 }
 
 int A_Star::Node::f() const {
-    return g+h;
+	return g + h;
 }
 
-size_t A_Star::Node_hash::operator()(const Node& node) const{
-    const size_t hashx = std::hash<int>() (node.x);
-    const size_t hashy = std::hash<int>() (node.y);
-    // XOR to avoid hash collision
-    return hashx ^ hashy;
+size_t A_Star::Node_hash::operator()(const Node& node) const {
+	const size_t hashx = std::hash<int>() (node.x);
+	const size_t hashy = std::hash<int>() (node.y);
+	// XOR to avoid hash collision
+	return hashx ^ hashy;
 }
 
-bool A_Star::Compare_coord::operator()(const Node& lhs, const Node& rhs){
-    return rhs.x == lhs.x && rhs.y == rhs.y;
+bool A_Star::Compare_cord::operator()(const Node& lhs, const Node& rhs) {
+	return rhs.x == lhs.x && rhs.y == rhs.y;
 }
 
-bool A_Star::Compare_f_cost::operator()(const Node& node1, const Node& node2){
-    return node1.f() < node2.f();
+bool A_Star::Compare_f_cost::operator()(const Node& node1, const Node& node2) {
+	return node1.f() < node2.f();
 }
 
-bool A_Star::Compare_g_cost::operator()(const Node& node1, const Node& node2){
-    return node1.g < node2.g;
+bool A_Star::Compare_g_cost::operator()(const Node& node1, const Node& node2) {
+	return node1.g < node2.g;
 }
 
-A_star::A_star(){}
+A_star::A_star() {
+	//TODO - done maybe?
+	
+	// sets target and current_pose (and start?)
+	gpsCallback();
+	// sets cost_map (and start?)
+	costmapCallback();
+	// both of the above functions seem to edit start, is this an error?
+	// open_set and closed_set are both empty
+}
 
 void A_star::backtracker(){
     Node cur = closed_set.find(target);
@@ -64,16 +73,16 @@ bool A_star::validNode(const Node& node) {
     return true;
 }
 
-bool A_star::processNode(const int x, const int y, const Node* parent){
-    Node node = Node(x, y, parent);
-    if(Compare_coord(node, target)){
-        closed_set.insert(node);
-        return true;
-    }
-    if(valid_node(node)){
-        open_set.push(node);
-    }
-    return false;
+bool A_star::processNode(const int x, const int y, const Node* parent) {
+	Node node = Node(x, y, parent);
+	if (Compare_cord(node, target)) {
+		closed_set.insert(node);
+		return true;
+	}
+	if (valid_node(node)) {
+		open_set.push(node);
+	}
+	return false;
 }
 
 bool A_star::search(){
@@ -108,7 +117,8 @@ void A_star::gpsCallback(const nav_msgs::Odometry::ConstPtr& msg){
     target = Node(msg->pose.pose.position.x, msg->pose.pose.position.y, nullptr);
 }
 
-void A_star::costmapCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg){
+oid A_star::costmapCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg)
+{
 	// Fill out the costmap width and height from the occupancy grid info message
     int costmap_width = msg->info.width;
     int costmap_height = msg->info.height;
