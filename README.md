@@ -7,5 +7,5 @@ We need to find the optimal path for the robot to take between GPS waypoints. A*
 # Instillation
 
 # Contributors
-
+Authored by Ravij Bharadwaj, Jeremey Mervak, and Sean Oliver. Maintained by Sean Oliver.
 
