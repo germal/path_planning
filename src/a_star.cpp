@@ -1,7 +1,7 @@
 #include "a_star.h"
 #include <algorithm>
 
-A_Star::Node::Node(const int x_in, const int y_in, const Node* parent_in) {
+Node::Node(const int x_in, const int y_in, const Node* parent_in) {
 	x = x_in;
 	y = y_in;
 	parent = parent_in;
@@ -9,39 +9,30 @@ A_Star::Node::Node(const int x_in, const int y_in, const Node* parent_in) {
 	h = calculateEuclideanDistance(*this, target);
 }
 
-int A_Star::Node::f() const {
+int Node::f() const {
 	return g + h;
 }
 
-size_t A_Star::Node_hash::operator()(const Node& node) const {
+size_t Node_hash::operator()(const Node& node) const {
 	const size_t hashx = std::hash<int>() (node.x);
 	const size_t hashy = std::hash<int>() (node.y);
 	// XOR to avoid hash collision
 	return hashx ^ hashy;
 }
 
-bool A_Star::Compare_cord::operator()(const Node& lhs, const Node& rhs) {
+bool Compare_cord::operator()(const Node& lhs, const Node& rhs) {
 	return rhs.x == lhs.x && rhs.y == rhs.y;
 }
 
-bool A_Star::Compare_f_cost::operator()(const Node& node1, const Node& node2) {
+bool Compare_f_cost::operator()(const Node& node1, const Node& node2) {
 	return node1.f() < node2.f();
 }
 
-bool A_Star::Compare_g_cost::operator()(const Node& node1, const Node& node2) {
+bool Compare_g_cost::operator()(const Node& node1, const Node& node2) {
 	return node1.g < node2.g;
 }
 
-A_star::A_star() {
-	//TODO - done maybe?
-	
-	// sets target and current_pose (and start?)
-	gpsCallback();
-	// sets cost_map (and start?)
-	costmapCallback();
-	// both of the above functions seem to edit start, is this an error?
-	// open_set and closed_set are both empty
-}
+A_star::A_star() {}
 
 void A_star::backtracker(){
     Node cur = closed_set.find(target);
