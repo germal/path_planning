@@ -1,41 +1,49 @@
 #include "a_star.h"
+#include <algorithm>
 
-Node::Node(const int x, const int y, const Node* parent, const int h){
-    x = x;
-    y = y;
-    parent = parent;
-    g = parent->g + cost_map[x][y];
-    h = calculateEuclideanDistance(*this, target);
+A_Star::Node::Node(const int x_in, const int y_in, const Node* parent_in) {
+	x = x_in;
+	y = y_in;
+	parent = parent_in;
+	g = parent->g + cost_map[x][y];
+	h = calculateEuclideanDistance(*this, target);
 }
 
-int Node::f() const {
-    return g+h;
+int A_Star::Node::f() const {
+	return g + h;
 }
 
-size_t Node_hash::operator()(const Node& node) const{
-    const size_t hashx = std::hash<int>() (node.x);
-    const size_t hashy = std::hash<int>() (node.y);
-    // XOR to avoid hash collision
-    return hashx ^ hashy;
+size_t A_Star::Node_hash::operator()(const Node& node) const {
+	const size_t hashx = std::hash<int>() (node.x);
+	const size_t hashy = std::hash<int>() (node.y);
+	// XOR to avoid hash collision
+	return hashx ^ hashy;
 }
 
-bool Compare_cord::operator()(const Node& lhs, const Node& rhs){
-    return rhs.x == lhs.x && rhs.y == rhs.y;
+bool A_Star::Compare_cord::operator()(const Node& lhs, const Node& rhs) {
+	return rhs.x == lhs.x && rhs.y == rhs.y;
 }
 
-bool Compare_f_cost::operator()(const Node& node1, const Node& node2){
-    return node1.f() < node2.f();
+bool A_Star::Compare_f_cost::operator()(const Node& node1, const Node& node2) {
+	return node1.f() < node2.f();
 }
 
-bool Compare_g_cost::operator()(const Node& node1, const Node& node2){
-    return node1.g < node2.g;
+bool A_Star::Compare_g_cost::operator()(const Node& node1, const Node& node2) {
+	return node1.g < node2.g;
 }
 
-A_star::A_star(){
-    //TODO
+A_star::A_star() {
+	//TODO - done maybe?
+	
+	// sets target and current_pose (and start?)
+	gpsCallback();
+	// sets cost_map (and start?)
+	costmapCallback();
+	// both of the above functions seem to edit start, is this an error?
+	// open_set and closed_set are both empty
 }
 
-void A_star::Backtracker(std::vector<Node>& path){
+void A_star::backtracker(){
     Node cur = closed_set.find(target);
     while(cur.parent){
         path.insert(cur);
@@ -45,15 +53,9 @@ void A_star::Backtracker(std::vector<Node>& path){
     std::reverse(path.begin(), path.end());
 }
 
-bool A_star:ValidNode(const Node& node) {
-    if(cost_map.empty()){
-        // TODO we have a problem
-    }
+bool A_star::validNode(const Node& node) {
     const int cost_map_height = cost_map.size();
-    if(cost_map[0].empty()){
-        // TODO we have a problem
-    }
-    cobst int cost_map_width = cost_map[0].size();
+    const int cost_map_width = cost_map[0].size();
     // check if position is 'in-bounds'
     if(node.x < 0 || node.y < 0 || node.x >= cost_map_width || node.y >= cost_map_height){
         return false;
@@ -70,55 +72,64 @@ bool A_star:ValidNode(const Node& node) {
     // else we want to explore node
     return true;
 }
-void A_star::gpsCallback(const nav_msgs::Odometry::ConstPtr& msg){}
-void A_star::costMapCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg){}
 
-void A_star::Search(){
+bool A_star::processNode(const int x, const int y, const Node* parent) {
+	Node node = Node(x, y, parent);
+	if (Compare_cord(node, target)) {
+		closed_set.insert(node);
+		return true;
+	}
+	if (valid_node(node)) {
+		open_set.push(node);
+	}
+	return false;
+}
+
+bool A_star::search(){
     open_set.insert(start);
     while(!open_set.empty()){
         Node cur = open_set.top();
         open_set.pop();
         // Using 4 connected for now
         //TODO make 8 connected
-        Node north = Node(cur.x, cur.y+1, &cur);
-        if(north == target){
-            closed_set.insert(north);
+        if(processNode(cur.x, cur.y+1, &cur) // north
+        || processNode(cur.x+1, cur.y, &cur) // east
+        || processNode(cur.x, cur.y-1, &cur) // south
+        || processNode(cur.x-1, cur.y, &cur) // west
+        || processNode(cur.x + 1, cur.y + 1, &cur) // north-east
+        || processNode(cur.x + 1, cur.y - 1, &cur) // south-east
+        || processNode(cur.x - 1, cur.y + 1, &cur) // north-west
+        || processNode(cur.x - 1, cur.y - 1, &cur)) { // south-west
             break;
-        }
-        if(valid_node(north)){
-            open_set.push(north);
-        }
-        Node east = Node(cur.x+1, cur.y, &cur);
-        if(east == target){
-            closed_set.insert(east);
-            break;
-        }
-        if(valid_node(east)){
-            open_set.push(east);
-        }
-        Node south = Node(cur.x, cur.y-1, &cur);
-        if(south == target){
-            closed_set.insert(south);
-            break;
-        }
-        if(valid_node(south)){
-            open_set.push(south);
-        }
-        Node west = Node(cur.x-1, cur.y, &cur);
-        if(west == target){
-            closed_set.insert(south);
-            break;
-        }
-        if(valid_node(west)){
-            open_set.push(west);
         }
         closed_set.insert(cur);
     }
-    std::vector<Node> path;
-    backtracker(path);
+    backtracker();
+    return true;
 }
 
-double A_star::calculateEuclideanDistance(const Node& node1, const Node& node2)
+double A_star::calculateEuclideanDistance(const Node& node1, const Node& node2){
+    return pow(node1.x - node2.x, 2) - pow(node1.y - node2.y, 2); // can compare dist^2
+}
+
+void A_star::gpsCallback(const nav_msgs::Odometry::ConstPtr& msg){
+    // Fill out the needed "target" position member variable using info from the odom message
+    target = Node(msg->pose.pose.position.x, msg->pose.pose.position.y, nullptr);
+}
+
+oid A_star::costmapCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg)
 {
-    return pow(pow(node1.x - node2.x, 2) - pow(node1.y - node2.y, 2),0.5);
+	// Fill out the costmap width and height from the occupancy grid info message
+    int costmap_width = msg->info.width;
+    int costmap_height = msg->info.height;
+
+    // Fill out the needed "start" position member variable using info from the costmap origin message
+    start = Node(msg->info.origin.orientation.x, msg->info.origin.orientation.y, nullptr);
+
+    // Fill out the costmap member variable using info from the occupancy grid costmap message
+    for(int i = 0; i < costmap_width; i++){
+        for(int j = 0; j < costmap_height; j++){
+            cost_map[i][j] = msg->data[i + (j * costmap_width)];
+        }
+    }
 }
