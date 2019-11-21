@@ -5,6 +5,7 @@
 #include <queue>
 #include <unordered_set>
 #include <cmath>
+#include <gtest/gtest_prod.h>
 
 class Node{
     public:
@@ -45,7 +46,7 @@ class A_star{
         void gpsCallback(const nav_msgs::Odometry::ConstPtr& msg);
         void costMapCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg);
         double calculateEuclideanDistance(const Node& node1, const Node& node2);
-
+        FRIEND_TEST(NodeTests);
     private:
         const Node start;
         const Node target;
