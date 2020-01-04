@@ -1,0 +1,18 @@
+image: test_map.pgm # this can be any image file, you can generate one with GIMP or any image editing program
+resolution: 0.01 # meters / cell
+origin: [0, 0, 0] # what cordinate is the lower-left corner
+# These numbers are taken from turtlesim free must be less than occupied
+occupied_thresh: 0.65 # pixels with occupancy probability greater than this are considered occupied
+free_thresh: 0.196 # pixels with occupancy probability less than this are considered free
+negate: 0 #should black be occupied or white: 0 means black
+width:  20 # width/height in RViz
+height: 20
+# see http://wiki.ros.org/map_server for more info
+# Instructions
+# 1. Run rosrun map_server map_server $PATH
+#   a. Make sure to run roscore before using rosrun
+# 2. rosnode list will tell you the node the map server is on
+#   a. I'll refer to this name as $NODE
+# 3. rosnode info $NODE will tell you what the node is publishing
+# 4. The occupancy grid data can be seen with rostopic echo /map
+# 5. The map itself can be seen using rosservice call /static_map
