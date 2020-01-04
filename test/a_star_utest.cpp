@@ -1,11 +1,35 @@
 #include <gtest/gtest.h>
+#include <nav_msgs/OccupancyGrid.h>
+#include <nav_msgs/Odometry.h>
 #include "../src/a_star.h"
 
 class NodeTest : public testing::Test{
     protected:
     A_star pathPlanner{};
     static void SetUpTestSuite(){
+        nav_msgs::OccupancyGrid cost_map;
+    }
+    static void TearDownTestSuite(){
 
+    }
+    virtual void SetUp(){
+
+    }
+    virtual void TearDown(){
+
+    }
+};
+
+class OneRoute : public testing::Test{
+    protected:
+    A_star pathPlanner{};
+    static void SetUpTestSuite(){
+        nav_msgs::OccupancyGrid cost_map;
+        int8_t arr[4][4] = {{0, 0, 0, 0},
+                    {9, 9, 9, 0},
+                     {0, 0, 9, 0},
+                     {0, 0, 9, 0}};
+        cost_map.data = arr;
     }
     static void TearDownTestSuite(){
 
@@ -44,12 +68,12 @@ TEST(NodeTest, nodeCtorWithParent){
 
 TEST(NodeTest, fCost){
     Node node(1, 2, nullptr);
-    ASSERT_EQ(node.f(), //todo);
+    //ASSERT_EQ(node.f(), //todo);
 }
 
 TEST(IntegerOverflowTest, fCost){
     Node node(1,2, nullptr);
-    ASSERT_EQ(node.f(), //todo);
+    //ASSERT_EQ(node.f(), //todo);
 }
 
 TEST(NoTarget, backtracking){
