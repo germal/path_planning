@@ -4,6 +4,7 @@
 #include <nav_msgs/OccupancyGrid.h>
 #include <nav_msgs/Odometry.h>
 #include <sensor_msgs/Imu.h>
+#include <path_planning/path>
 
 
 const std::string kGPS_topic = "/odometry/filtered";
@@ -59,7 +60,7 @@ int main(int argc, char **argv) {
 	// Stop running timer that calculates path
 	timer.stop();
 
-	ros::Publisher path_pub = n.advertise<vector<geometry_msgs::position>("path", 1000);
+	ros::Publisher path_pub = n.advertise<path_planning::path>("path", 1000);
 	path_pub.publish(path.solution_path);
 	return 0;
 }
