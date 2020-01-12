@@ -1,1 +1,1 @@
-vector<geometry_msgs::position>
+geometry_msgs/Point[]
