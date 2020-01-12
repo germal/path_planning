@@ -11,18 +11,26 @@ find_package(catkin REQUIRED COMPONENTS
     message_generation
 )
 
+add_message_files(
+  FILES
+  path.msg
+)
+
+generate_messages(
+    DEPENDANCIES
+    geometry_msgs
+    std_msgs
+)
+
 catkin_package(
     CATKIN_DEPENDS message_runtime 
+    CATKIN_DEPENDS geometry_msgs
 )
 
 include_directories(${catkin_INCLUDE_DIRS})
 
 add_executable(${PROJECT_NAME}_node test/a_star_utest.cpp)
 
-add_message_files(
-  FILES
-  path.msg
-)
 
 target_link_libraries(${PROJECT_NAME}_node
     ${CATKIN_LIBRARIES}
