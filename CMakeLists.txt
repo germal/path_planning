@@ -11,11 +11,18 @@ find_package(catkin REQUIRED COMPONENTS
     message_generation
 )
 
-catkin_package()
+catkin_package(
+    CATKIN_DEPENDS message_runtime 
+)
 
 include_directories(${catkin_INCLUDE_DIRS})
 
 add_executable(${PROJECT_NAME}_node test/a_star_utest.cpp)
+
+add_message_files(
+  FILES
+  path.msg
+)
 
 target_link_libraries(${PROJECT_NAME}_node
     ${CATKIN_LIBRARIES}
