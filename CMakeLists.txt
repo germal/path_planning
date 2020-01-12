@@ -7,9 +7,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 find_package(catkin REQUIRED COMPONENTS
+    roscpp
     nav_msgs
+    geometry_msgs
     message_generation
 )
+
+include_directories(${catkin_INCLUDE_DIRS})
 
 add_message_files(
   FILES
@@ -17,19 +21,18 @@ add_message_files(
 )
 
 generate_messages(
-    DEPENDANCIES
-    geometry_msgs
-    std_msgs
+  DEPENDENCIES
+  geometry_msgs
 )
 
 catkin_package(
-    CATKIN_DEPENDS message_runtime 
-    CATKIN_DEPENDS geometry_msgs
+  CATKIN_DEPENDS message_runtime
+  CATKIN_DEPENDS geometry_msgs
 )
 
-include_directories(${catkin_INCLUDE_DIRS})
 
-add_executable(${PROJECT_NAME}_node test/a_star_utest.cpp)
+
+add_executable(${PROJECT_NAME}_node src/listener.cpp)
 
 
 target_link_libraries(${PROJECT_NAME}_node
