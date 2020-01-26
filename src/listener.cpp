@@ -1,10 +1,10 @@
 #include "a_star.h"
-#include <ros/ros.h">
+#include <ros/ros.h>
 #include <std_msgs/String.h>
 #include <nav_msgs/OccupancyGrid.h>
 #include <nav_msgs/Odometry.h>
 #include <sensor_msgs/Imu.h>
-#include <path_planning/path>
+#include <path_planning/path.h>
 
 
 const std::string kGPS_topic = "/odometry/filtered";

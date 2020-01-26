@@ -13,7 +13,10 @@ find_package(catkin REQUIRED COMPONENTS
     message_generation
 )
 
-include_directories(${catkin_INCLUDE_DIRS})
+include_directories(
+  include
+  ${catkin_INCLUDE_DIRS}
+  )
 
 add_message_files(
   FILES
@@ -26,6 +29,7 @@ generate_messages(
 )
 
 catkin_package(
+  CATKIN_DEPENDS roscpp
   CATKIN_DEPENDS message_runtime
   CATKIN_DEPENDS geometry_msgs
 )
@@ -34,6 +38,7 @@ catkin_package(
 
 add_executable(${PROJECT_NAME}_node src/listener.cpp)
 
+add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 target_link_libraries(${PROJECT_NAME}_node
     ${CATKIN_LIBRARIES}
