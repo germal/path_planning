@@ -1,5 +1,6 @@
 #include "a_star.h"
 #include <algorithm>
+#include <iostream>
 
 Node::Node(const int x_in, const int y_in, const Node* parent_in) {
 	x = x_in;

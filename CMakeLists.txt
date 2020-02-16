@@ -35,11 +35,11 @@ catkin_package(
 )
 
 
-
-add_executable(${PROJECT_NAME}_node src/listener.cpp)
+add_library(a_star src/a_star.cpp src/a_star.h)
+add_executable(${PROJECT_NAME}_node src/listener.cpp src/a_star.h)
 
 add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 target_link_libraries(${PROJECT_NAME}_node
-  ${catkin_LIBRARIES}
+  ${catkin_LIBRARIES} a_star
 )
