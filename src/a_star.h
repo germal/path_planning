@@ -11,7 +11,7 @@
 
 class Node{
     public:
-        Node(const int x_in, const int y_in, const Node* parent_in);
+        Node(int x_in, int y_in, const Node* parent_in);
         int f() const;
     private:
         const int x;

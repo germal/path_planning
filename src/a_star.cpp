@@ -2,9 +2,9 @@
 #include <algorithm>
 #include <iostream>
 
-Node::Node(const int x_in, const int y_in, const Node* parent_in) {
-	x = x_in;
-	y = y_in;
+Node::Node(int x_in, int y_in, const Node* parent_in) : x(x_in), y(y_in){
+	// x = x_in;
+	// y = y_in;
 	parent = parent_in;
 	g = parent->g + cost_map[x][y];
 	h = calculateEuclideanDistance(*this, target);
