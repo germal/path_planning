@@ -108,7 +108,7 @@ void A_star::gpsCallback(const nav_msgs::Odometry::ConstPtr& msg){
     target = Node(msg->pose.pose.position.x, msg->pose.pose.position.y, nullptr);
 }
 
-oid A_star::costmapCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg)
+void A_star::costmapCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg)
 {
 	// Fill out the costmap width and height from the occupancy grid info message
     int costmap_width = msg->info.width;

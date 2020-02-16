@@ -6,6 +6,8 @@
 #include <unordered_set>
 #include <cmath>
 #include <gtest/gtest_prod.h>
+#include <nav_msgs/Odometry.h>
+#include <nav_msgs/OccupancyGrid.h>
 
 class Node{
     public:
@@ -43,7 +45,7 @@ class Compare_g_cost{
 class A_star{
     public:
         A_star();
-        void search();
+        bool search();
         void backtracker(std::vector<Node>& path);
         bool validNode(const Node& node);
         bool processNode(const int x, const int y, const Node* parent);

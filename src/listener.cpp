@@ -1,8 +1,6 @@
 #include "a_star.h"
 #include <ros/ros.h>
 #include <std_msgs/String.h>
-#include <nav_msgs/OccupancyGrid.h>
-#include <nav_msgs/Odometry.h>
 #include <sensor_msgs/Imu.h>
 #include <path_planning/path.h>
 
@@ -19,7 +17,7 @@ private:
 	A_star &listener;
 	bool at_target;
 public:
-	vector<geometry_msgs::position> solution_path;
+	path_planning::path solution_path;
 	calculate_path(ros::Subscriber &gps_in, ros::Subscriber &costmap_in, A_star &a_star)
 		: gps(gps_in), costmap(costmap_in), listener(a_star), at_target(false) {}
 	void operator()(const ros::TimerEvent&);
@@ -35,8 +33,8 @@ int main(int argc, char **argv) {
 
 	A_star listener = A_star{};
 
-	ros::Subscriber gps_sub = n.subscribe(kGPS_topic, 1000, listener.gpsCallback);
-	ros::Subscriber costmap_sub = n.subscribe(kCostmap_topic, 1000, listener.costMapCallback);
+	ros::Subscriber gps_sub = n.subscribe(kGPS_topic, 1000, &A_star::gpsCallback, &listener);
+	ros::Subscriber costmap_sub = n.subscribe(kCostmap_topic, 1000, &A_star::costMapCallback, &listener);
 
 	// Calculated path vector can be accessed via path.solution_path
 	calculate_path path(gps_sub, costmap_sub, listener);
