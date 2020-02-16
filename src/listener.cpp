@@ -14,7 +14,7 @@ class calculate_path {
 private:
 	ros::Subscriber &gps;
 	ros::Subscriber &costmap;
-	A_star &listener;
+	A_star listener;
 	bool at_target;
 public:
 	path_planning::path solution_path;
@@ -33,37 +33,37 @@ int main(int argc, char **argv) {
 
 	A_star listener = A_star{};
 
-	ros::Subscriber gps_sub = n.subscribe(kGPS_topic, 1000, &A_star::gpsCallback, &listener);
-	ros::Subscriber costmap_sub = n.subscribe(kCostmap_topic, 1000, &A_star::costMapCallback, &listener);
+	// ros::Subscriber gps_sub = n.subscribe(kGPS_topic, 1000, &A_star::gpsCallback, &listener);
+	// ros::Subscriber costmap_sub = n.subscribe(kCostmap_topic, 1000, &A_star::costMapCallback, &listener);
 
-	// Calculated path vector can be accessed via path.solution_path
-	calculate_path path(gps_sub, costmap_sub, listener);
+	// // Calculated path vector can be accessed via path.solution_path
+	// calculate_path path(gps_sub, costmap_sub, listener);
 	
-	// Update coordinates once before calculating path
-	ros::spinOnce();
+	// // Update coordinates once before calculating path
+	// ros::spinOnce();
 
-	// Start running A* at a frequency specified by period to keep updating path
-	// as the area is traversed
-	const double period = 0.05;
-	ros::Timer timer = n.createTimer(ros::Duration(period), path);
-	timer.start();
+	// // Start running A* at a frequency specified by period to keep updating path
+	// // as the area is traversed
+	// const double period = 0.05;
+	// ros::Timer timer = n.createTimer(ros::Duration(period), path);
+	// timer.start();
 
-	// Keep spinning until you reach the target
-    ros::Rate rate(10); // 10 hz
-	while(!path.get_at_target()) {
-		ros::spinOnce();
-        rate.sleep();
-    }
+	// // Keep spinning until you reach the target
+ //    ros::Rate rate(10); // 10 hz
+	// while(!path.get_at_target()) {
+	// 	ros::spinOnce();
+ //        rate.sleep();
+ //    }
 
-	// Stop running timer that calculates path
-	timer.stop();
+	// // Stop running timer that calculates path
+	// timer.stop();
 
-	ros::Publisher path_pub = n.advertise<path_planning::path>("path", 1000);
-	path_pub.publish(path.solution_path);
+	// ros::Publisher path_pub = n.advertise<path_planning::path>("path", 1000);
+	// path_pub.publish(path.solution_path);
 	return 0;
 }
 
 void calculate_path::operator()(const ros::TimerEvent&) {
 	// Attempt to find a solution
-	at_target = listener.search();
+	// at_target = listener.search();
 }
