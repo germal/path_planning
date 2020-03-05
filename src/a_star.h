@@ -16,10 +16,6 @@ class Node{
         int f() const;
         void set_h(const Node* target);
         void set_g(const int cost_map_value);
-        int get_x() const;
-        int get_y() const;
-        int get_g() const;
-    private:
         const int x;
         const int y;
         const Node* parent;
@@ -52,7 +48,7 @@ class A_star{
     public:
         A_star();
         bool search();
-        void backtracker(std::vector<Node>& path);
+        void backtracker();
         bool validNode(const Node& node);
         bool processNode(const int x, const int y, const Node* parent);
         void gpsCallback(const nav_msgs::Odometry::ConstPtr& msg);
@@ -60,7 +56,7 @@ class A_star{
     private:
         const Node start;
         const Node target;
-        std::vector<Node> path;
+        std::vector<const Node*> path;
         std::priority_queue<Node, std::vector<Node>, Compare_f_cost> open_set;
         std::unordered_set<Node, Node_hash, Compare_coord> closed_set;
         std::vector<std::vector<int>> cost_map;

@@ -19,28 +19,15 @@ void Node::set_g(const int cost_map_value){
     g = parent->g + cost_map_value;
 }
 
-int Node::get_x() const{
-    return x;
-}
-
-int Node::get_y() const{
-    return y;
-}
-
-int Node::get_g() const{
-    return g;
-}
-
-
 size_t Node_hash::operator()(const Node& node) const {
-	const size_t hashx = std::hash<int>() (node.get_x());
-	const size_t hashy = std::hash<int>() (node.get_y());
+	const size_t hashx = std::hash<int>() (node.x);
+	const size_t hashy = std::hash<int>() (node.y);
 	// XOR to avoid hash collision
 	return hashx ^ hashy;
 }
 
 bool Compare_coord::operator()(const Node& lhs, const Node& rhs) {
-	return rhs.get_x() == lhs.get_x() && rhs.get_y() == rhs.get_y();
+	return rhs.x == lhs.x && rhs.y == rhs.y;
 }
 
 bool Compare_f_cost::operator()(const Node& node1, const Node& node2) {
@@ -48,18 +35,18 @@ bool Compare_f_cost::operator()(const Node& node1, const Node& node2) {
 }
 
 bool Compare_g_cost::operator()(const Node& node1, const Node& node2) {
-	return node1.get_g() < node2.get_g();
+	return node1.g < node2.g;
 }
 
 A_star::A_star() {}
 
 void A_star::backtracker(){
-    Node cur = closed_set.find(target);
-    while(cur.parent){
-        path.insert(cur);
-        cur = cur.parent;
+    const Node* cur = &*closed_set.find(target); //need to dereference iterator and then turn into ptr
+    while(cur->parent){
+        path.push_back(cur);
+        cur = cur->parent;
     }
-    path.insert(start);
+    path.push_back(&start);
     std::reverse(path.begin(), path.end());
 }
 
@@ -70,33 +57,27 @@ bool A_star::validNode(const Node& node) {
     if(node.x < 0 || node.y < 0 || node.x >= cost_map_width || node.y >= cost_map_height){
         return false;
     }
-    // check if we have already visited node
-    auto it = closed_set.find(node);
-    if(!it){
-        it = find(open_set.begin(), open_set.end(), node);
-    }
-    // if we have already found node with lower cost don't add node
-    if(it && it->g <= node.g){
-        return false;
-    }
-    // else we want to explore node
-    return true;
+    // if we have already explored node don't re-explore it
+    return closed_set.count(node) == 0;
+    // Don't bother checking open_set because if we add duplicates
+    // the higher f costs will already be in closed set when we check validNode
+    // this sin't quite as efficient, but it keeps us from search the whole PQ
 }
 
 bool A_star::processNode(const int x, const int y, const Node* parent) {
 	Node node = Node(x, y, parent);
-	if (Compare_cord(node, target)) {
-		closed_set.insert(node);
+	if (Compare_coord(node, target)) {
+		closed_set.insert(&node);
 		return true;
 	}
-	if (valid_node(node)) {
+	if (validNode(node)) {
 		open_set.push(node);
 	}
 	return false;
 }
 
 bool A_star::search(){
-    open_set.insert(start);
+    open_set.push(start);
     while(!open_set.empty()){
         Node cur = open_set.top();
         open_set.pop();
@@ -110,7 +91,7 @@ bool A_star::search(){
         || processNode(cur.x - 1, cur.y - 1, &cur)) { // south-west
             break;
         }
-        closed_set.insert(cur);
+        closed_set.insert(&cur);
     }
     backtracker();
     return true;
@@ -122,11 +103,13 @@ double calculateEuclideanDistance(const Node& node1, const Node& node2){
 
 void A_star::gpsCallback(const nav_msgs::Odometry::ConstPtr& msg){
     // Fill out the needed "target" position member variable using info from the odom message
-    target = Node(msg->pose.pose.position.x, msg->pose.pose.position.y, nullptr);
+    //target = new Node(msg->pose.pose.position.x, msg->pose.pose.position.y, nullptr);
+    //temp comment out
 }
 
 void A_star::costmapCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg)
 {
+    /* //temp comment out
 	// Fill out the costmap width and height from the occupancy grid info message
     int costmap_width = msg->info.width;
     int costmap_height = msg->info.height;
@@ -140,4 +123,5 @@ void A_star::costmapCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg)
             cost_map[i][j] = msg->data[i + (j * costmap_width)];
         }
     }
+    */
 }
