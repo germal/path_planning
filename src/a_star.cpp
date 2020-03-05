@@ -66,8 +66,8 @@ bool A_star::validNode(const Node& node) {
 
 bool A_star::processNode(const int x, const int y, const Node* parent) {
 	Node node = Node(x, y, parent);
-	if (Compare_coord(node, target)) {
-		closed_set.insert(&node);
+	if (Compare_coord()(node, target)) {
+		closed_set.insert(node);
 		return true;
 	}
 	if (validNode(node)) {
@@ -91,7 +91,7 @@ bool A_star::search(){
         || processNode(cur.x - 1, cur.y - 1, &cur)) { // south-west
             break;
         }
-        closed_set.insert(&cur);
+        closed_set.insert(cur);
     }
     backtracker();
     return true;
@@ -107,7 +107,7 @@ void A_star::gpsCallback(const nav_msgs::Odometry::ConstPtr& msg){
     //temp comment out
 }
 
-void A_star::costmapCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg)
+void A_star::costMapCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg)
 {
     /* //temp comment out
 	// Fill out the costmap width and height from the occupancy grid info message
