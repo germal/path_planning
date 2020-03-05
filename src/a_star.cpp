@@ -5,6 +5,8 @@
 Node::Node(int x_in, int y_in, const Node* parent_in) : x{x_in}, y{y_in}, h{-1}, 
     g{-1}, parent{parent_in} {} //g and h are set to -1 as default, these values must be set
 
+Node::Node() : Node(0,0,nullptr) {} //this is a C++11 feature called delegating constructors
+
 int Node::f() const {
 	return g + h;
 }
@@ -17,15 +19,28 @@ void Node::set_g(const int cost_map_value){
     g = parent->g + cost_map_value;
 }
 
+int Node::get_x() const{
+    return x;
+}
+
+int Node::get_y() const{
+    return y;
+}
+
+int Node::get_g() const{
+    return g;
+}
+
+
 size_t Node_hash::operator()(const Node& node) const {
-	const size_t hashx = std::hash<int>() (node.x);
-	const size_t hashy = std::hash<int>() (node.y);
+	const size_t hashx = std::hash<int>() (node.get_x());
+	const size_t hashy = std::hash<int>() (node.get_y());
 	// XOR to avoid hash collision
 	return hashx ^ hashy;
 }
 
-bool Compare_cord::operator()(const Node& lhs, const Node& rhs) {
-	return rhs.x == lhs.x && rhs.y == rhs.y;
+bool Compare_coord::operator()(const Node& lhs, const Node& rhs) {
+	return rhs.get_x() == lhs.get_x() && rhs.get_y() == rhs.get_y();
 }
 
 bool Compare_f_cost::operator()(const Node& node1, const Node& node2) {
@@ -33,7 +48,7 @@ bool Compare_f_cost::operator()(const Node& node1, const Node& node2) {
 }
 
 bool Compare_g_cost::operator()(const Node& node1, const Node& node2) {
-	return node1.g < node2.g;
+	return node1.get_g() < node2.get_g();
 }
 
 A_star::A_star() {}
@@ -85,8 +100,6 @@ bool A_star::search(){
     while(!open_set.empty()){
         Node cur = open_set.top();
         open_set.pop();
-        // Using 4 connected for now
-        //TODO make 8 connected
         if(processNode(cur.x, cur.y+1, &cur) // north
         || processNode(cur.x+1, cur.y, &cur) // east
         || processNode(cur.x, cur.y-1, &cur) // south

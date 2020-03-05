@@ -11,10 +11,14 @@
 
 class Node{
     public:
+        Node();
         Node(int x_in, int y_in, const Node* parent_in);
         int f() const;
         void set_h(const Node* target);
         void set_g(const int cost_map_value);
+        int get_x() const;
+        int get_y() const;
+        int get_g() const;
     private:
         const int x;
         const int y;
