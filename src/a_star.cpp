@@ -2,16 +2,19 @@
 #include <algorithm>
 #include <iostream>
 
-Node::Node(int x_in, int y_in, const Node* parent_in) : x(x_in), y(y_in){
-	// x = x_in;
-	// y = y_in;
-	parent = parent_in;
-	g = parent->g + cost_map[x][y];
-	h = calculateEuclideanDistance(*this, target);
-}
+Node::Node(int x_in, int y_in, const Node* parent_in) : x{x_in}, y{y_in}, h{-1}, 
+    g{-1}, parent{parent_in} {} //g and h are set to -1 as default, these values must be set
 
 int Node::f() const {
 	return g + h;
+}
+
+void Node::set_h(const Node* target){
+    h = calculateEuclideanDistance(*this, *target);
+}
+
+void Node::set_g(const int cost_map_value){
+    g = parent->g + cost_map_value;
 }
 
 size_t Node_hash::operator()(const Node& node) const {
@@ -100,7 +103,7 @@ bool A_star::search(){
     return true;
 }
 
-double A_star::calculateEuclideanDistance(const Node& node1, const Node& node2){
+double calculateEuclideanDistance(const Node& node1, const Node& node2){
     return pow(node1.x - node2.x, 2) - pow(node1.y - node2.y, 2); // can compare dist^2
 }
 

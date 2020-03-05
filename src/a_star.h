@@ -13,12 +13,14 @@ class Node{
     public:
         Node(int x_in, int y_in, const Node* parent_in);
         int f() const;
+        void set_h(const Node* target);
+        void set_g(const int cost_map_value);
     private:
         const int x;
         const int y;
         const Node* parent;
         int g;
-        const int h;
+        int h;
 };
 
 class Node_hash{
@@ -41,7 +43,7 @@ class Compare_g_cost{
     bool operator()(const Node& node1, const Node& node2);
 };
 
-
+double calculateEuclideanDistance(const Node& node1, const Node& node2);
 class A_star{
     public:
         A_star();
@@ -51,7 +53,6 @@ class A_star{
         bool processNode(const int x, const int y, const Node* parent);
         void gpsCallback(const nav_msgs::Odometry::ConstPtr& msg);
         void costMapCallback(const nav_msgs::OccupancyGrid::ConstPtr& msg);
-        double calculateEuclideanDistance(const Node& node1, const Node& node2);
     private:
         const Node start;
         const Node target;
